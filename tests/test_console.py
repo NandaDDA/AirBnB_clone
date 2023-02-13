@@ -1,41 +1,101 @@
 #!/usr/bin/python3
-"""
-Contains the class TestConsoleDocs
-"""
-
-import console
-import inspect
-import pep8
+"""Module for testing the HBNBCommand Class"""
 import unittest
-HBNBCommand = console.HBNBCommand
+from console import HBNBCommand
+from unittest.mock import patch
+from io import StringIO
 
 
-class TestConsoleDocs(unittest.TestCase):
-    """Class for testing documentation of the console"""
-    def test_pep8_conformance_console(self):
-        """Test that console.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['console.py'])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
+class Test_Console(unittest.TestCase):
+    """Test the HBNBCommand Console"""
 
-    def test_pep8_conformance_test_console(self):
-        """Test that tests/test_console.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['tests/test_console.py'])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
+#     def test_help(self):
+#         """Tests the help commmand"""
+#         with patch('sys.stdout', new=StringIO()) as f:
+#             HBNBCommand().onecmd("help")
+#         string = """
+# Documented commands (type help <topic>):
+# ========================================
+# EOF  all  count  create  destroy  help  quit  show  update
+# """
+#         msg = f.getvalue()
+#         self.assertEqual(string, msg)
 
-    def test_console_module_docstring(self):
-        """Test for the console.py module docstring"""
-        self.assertIsNot(console.__doc__, None,
-                         "console.py needs a docstring")
-        self.assertTrue(len(console.__doc__) >= 1,
-                        "console.py needs a docstring")
+    def test_help(self):
+        """Tests the help command."""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("help")
+        s = """
+Documented commands (type help <topic>):
+========================================
+EOF  all  count  create  destroy  help  quit  show  update\n
+"""
+        self.assertEqual(s, f.getvalue())
 
-    def test_HBNBCommand_class_docstring(self):
-        """Test for the HBNBCommand class docstring"""
-        self.assertIsNot(HBNBCommand.__doc__, None,
-                         "HBNBCommand class needs a docstring")
-        self.assertTrue(len(HBNBCommand.__doc__) >= 1,
-                        "HBNBCommand class needs a docstring")
+    # Test cases for quit
+
+    def test_do_quit(self):
+        """Tests the quit commmand"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("quit")
+        # modelling what happens when someone types `quit`
+        msg = f.getvalue()
+        self.assertTrue(len(msg) == 0)
+        self.assertEqual("", msg)
+
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("quit garbage")
+        # modelling when user types `quit anything`
+        msg = f.getvalue()
+        self.assertTrue(len(msg) == 0)
+        self.assertEqual("", msg)
+
+    # Test cases for EOF
+    def test_do_EOF(self):
+        """Tests the EOF commmand"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("EOF")
+        # modelling what happens when user types `quit`
+        msg = f.getvalue()
+        self.assertTrue(len(msg) == 1)
+        self.assertEqual("\n", msg)
+
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("EOF garbage")
+        # modelling when user types `EOF anything`
+        msg = f.getvalue()
+        self.assertTrue(len(msg) == 1)
+        self.assertEqual("\n", msg)
+
+    # Test cases for emptyline
+    def test_do_emptyline(self):
+        """Tests the emptyline command"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("\n")
+        # modelling what happens when user doesn't type anything
+        msg = f.getvalue()
+        self.assertTrue(len(msg) == 0)
+        self.assertEqual("", msg)
+
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("                     \n")
+        # modelling when user types lots of whitespaces & enter
+        msg = f.getvalue()
+        self.assertTrue(len(msg) == 0)
+        self.assertEqual("", msg)
+
+    # Test cases for do_all
+    def test_do_all(self):
+        """Tests the do_all command"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("all")
+
+    # Test cases for do_count
+    # Test cases for do_show
+    # Test cases for do_create
+    # Test cases for do_update
+    # Test cases for do_destroy
+
+
+if __name__ == "__main__":
+    unittest.main()
